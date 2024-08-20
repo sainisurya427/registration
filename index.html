@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        form label {
+            display: block;
+            margin-top: 10px;
+        }
+        form input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #userList {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        #userList div {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        #userList div:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Form</h1>
+        <form id="userForm">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required pattern="[a-zA-Z]+"><br>
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required pattern="[a-zA-Z]+"><br>
+            <label for="mobileNo">Mobile No:</label>
+            <input type="text" id="mobileNo" name="mobileNo" required pattern="\d{10}"><br>
+            <label for="emailId">Email ID:</label>
+            <input type="email" id="emailId" name="emailId" required><br>
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address"><br>
+            <label for="street">Street:</label>
+            <input type="text" id="street" name="street"><br>
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city"><br>
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state"><br>
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country"><br>
+            <label for="loginId">Login ID:</label>
+            <input type="text" id="loginId" name="loginId" required pattern="[a-zA-Z0-9]{8,}"><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required pattern="(?=.[a-z])(?=.[A-Z])(?=.*\d)[A-Za-z\d]{8,}"><br>
+            <button type="button" id="saveButton">Save</button>
+        </form>
+        <h2>Stored Users</h2>
+        <button type="button" id="loadButton">Load Users</button>
+        <div id="userList"></div>
+    </div>
+    <script>
+        document.getElementById('saveButton').addEventListener('click', function() {
+            const user = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                mobileNo: document.getElementById('mobileNo').value,
+                emailId: document.getElementById('emailId').value,
+                address: document.getElementById('address').value,
+                street: document.getElementById('street').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                country: document.getElementById('country').value,
+                loginId: document.getElementById('loginId').value,
+                password: document.getElementById('password').value,
+            };
+
+            fetch('http://localhost:3000/api/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.errors.join('\n')) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                alert('User saved successfully!');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Error saving user: ' + error.message);
+            });
+        });
+
+        document.getElementById('loadButton').addEventListener('click', function() {
+            fetch('http://localhost:3000/api/users')
+            .then(response => response.json())
+            .then(data => {
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';
+                data.forEach(user => {
+                    const userItem = document.createElement('div');
+                    userItem.textContent =` ${user.firstName} ${user.lastName}  ${user.emailId}  ${user.mobileNo}  ${user.address}  ${user.street}  ${user.city}  ${user.state}  ${user.country}  ${user.loginId}  ${user.password}`;
+                    userList.appendChild(userItem);
+                });
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Error loading users');
+            });
+        });
+    </script>
+</body>
+</html>

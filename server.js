@@ -11,7 +11,10 @@ const app = express();
 const port = 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+ origin:`https://registration-f40k.onrender.com/`,
+ methods:[`GET`,`POST`]
+}));
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
